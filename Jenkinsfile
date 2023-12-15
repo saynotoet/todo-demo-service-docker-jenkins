@@ -39,7 +39,26 @@ pipeline{
 				//sh "mvn failsafe:integration-test failsafe:verify"
 				echo 'Integration Test'
 			}
-		}	
+		}
+		stage('Build Docker Image'){
+			steps{
+				script{
+					dockerImage=docker.build("saynotoet/todo-demo-service:${env.BUILD_TAG}")
+				}
+				echo 'Docker Image Created'
+			}
+		}
+		stage('Push Docker Image'){
+			steps{
+				script{
+					docker.withRegistry('','myDockerHub'){
+						dockerImage.push()
+						dockerImage.push('latest')
+					}
+				}
+				echo 'Docker Image pushed'
+			}
+		}		
 	}
 	post{
 	
